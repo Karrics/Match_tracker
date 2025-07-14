@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>История матчей</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .match { border-bottom: 1px solid #ccc; margin-bottom: 30px; padding-bottom: 20px; }
+        .teams {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .team-blue, .team-red {
+            width: 48%;
+            border: 1px solid #9ecbff;
+            background-color: #f0f8ff;
+            padding: 10px;
+        }
+        .team-red {
+            border-color: #ff9ea6;
+            background-color: #fff0f5;
+        }
+        .player {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        img {
+            width: 30px;
+            height: auto;
+        }
+        strong {
+            color: #2c2c2c;
+        }
+    </style>
+</head>
+<body>
+    <h1>История матчей</h1>
+
+    {% for match in matches %}
+        <div class="match">
+            <strong>Матч {{ match.id }} | Победитель: {{ match.winner }} | Дата: {{ match.date }}</strong>
+            <div class="teams">
+                <div class="team-blue">
+                    <strong>Синяя команда</strong>
+                    {% for player in match.players if player[5] == 'Синяя' %}
+                        <div class="player">
+                            <img src="/static/images/{{ player[3] }}.png" alt="{{ player[3] }}">
+                            {{ player[2] }} ({{ player[3] }}) — KDA: {{ player[4] }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="team-red">
+                    <strong>Красная команда</strong>
+                    {% for player in match.players if player[5] == 'Красная' %}
+                        <div class="player">
+                            <img src="/static/images/{{ player[3] }}.png" alt="{{ player[3] }}">
+                            {{ player[2] }} ({{ player[3] }}) — KDA: {{ player[4] }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</body>
+</html>
