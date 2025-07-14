@@ -35,20 +35,90 @@
         strong {
             color: #2c2c2c;
         }
+        .add-form {
+            margin-top: 30px;
+            border: 1px solid #ccc;
+            padding: 20px;
+            max-width: 800px;
+        }
+        .login-form {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>История матчей</h1>
 
+    <!-- Форма добавления матча для всех -->
+    <div class="add-form">
+        <h2>Добавить матч</h2>
+        <form method="post" action="/add_match">
+            <label>Дата:</label><br>
+            <input type="date" name="date" required><br>
+
+            <label>Победившая команда:</label><br>
+            <select name="winner" required>
+                <option value="Синяя">Синяя</option>
+                <option value="Красная">Красная</option>
+            </select><br><br>
+
+            <div style="display: flex; justify-content: space-between;">
+                <div style="width: 48%;">
+                    <h3>Синяя команда</h3>
+                    {% for i in range(5) %}
+                        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+                            <label>Ник:</label><br>
+                            <input type="text" name="player_nick[]" required><br>
+
+                            <label>Персонаж:</label><br>
+                            <input type="text" name="player_champ[]" placeholder="ezreal" required><br>
+
+                            <label>KDA:</label><br>
+                            <input type="text" name="player_kda[]" placeholder="10/2/5" required><br>
+
+                            <input type="hidden" name="player_team[]" value="Синяя">
+                        </div>
+                    {% endfor %}
+                </div>
+                <div style="width: 48%;">
+                    <h3>Красная команда</h3>
+                    {% for i in range(5) %}
+                        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+                            <label>Ник:</label><br>
+                            <input type="text" name="player_nick[]" required><br>
+
+                            <label>Персонаж:</label><br>
+                            <input type="text" name="player_champ[]" placeholder="jinx" required><br>
+
+                            <label>KDA:</label><br>
+                            <input type="text" name="player_kda[]" placeholder="7/3/6" required><br>
+
+                            <input type="hidden" name="player_team[]" value="Красная">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit">Добавить матч</button>
+        </form>
+    </div>
+
+    <!-- Список матчей -->
     {% for match in matches %}
         <div class="match">
             <strong>Матч {{ match.id }} | Победитель: {{ match.winner }} | Дата: {{ match.date }}</strong>
+
+            {% if session.logged_in %}
+                <form action="/delete_match/{{ match.id }}" method="post" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Вы уверены?')">Удалить</button>
+                </form>
+            {% endif %}
+
             <div class="teams">
                 <div class="team-blue">
                     <strong>Синяя команда</strong>
                     {% for player in match.players if player[5] == 'Синяя' %}
                         <div class="player">
-                            <img src="/static/images/{{ player[3] }}.png" alt="{{ player[3] }}">
+                            <img src="https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/ {{ player[3] }}.png" alt="{{ player[3] }}" width="30">
                             {{ player[2] }} ({{ player[3] }}) — KDA: {{ player[4] }}
                         </div>
                     {% endfor %}
@@ -57,7 +127,7 @@
                     <strong>Красная команда</strong>
                     {% for player in match.players if player[5] == 'Красная' %}
                         <div class="player">
-                            <img src="/static/images/{{ player[3] }}.png" alt="{{ player[3] }}">
+                            <img src="https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/ {{ player[3] }}.png" alt="{{ player[3] }}" width="30">
                             {{ player[2] }} ({{ player[3] }}) — KDA: {{ player[4] }}
                         </div>
                     {% endfor %}
@@ -65,5 +135,17 @@
             </div>
         </div>
     {% endfor %}
+
+    <!-- Форма входа как админ -->
+    <div class="login-form">
+        <h3>Вход для администратора</h3>
+        <form action="/login" method="post">
+            <label>Логин:</label><br>
+            <input type="text" name="username" required><br>
+            <label>Пароль:</label><br>
+            <input type="password" name="password" required><br><br>
+            <button type="submit">Войти</button>
+        </form>
+    </div>
 </body>
 </html>

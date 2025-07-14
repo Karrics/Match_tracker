@@ -75,43 +75,51 @@ def login():
 
     if admin:
         session["logged_in"] = True
-        return redirect("/add_match")
-    else:
-        return "Неверный логин или пароль", 401
+    return redirect("/")
 
 @app.route('/logout')
 def logout():
     session.pop("logged_in", None)
     return redirect("/")
 
-@app.route('/add_match', methods=["GET", "POST"])
+@app.route('/add_match', methods=["POST"])
 def add_match():
+    date = request.form.get("date")
+    winner = request.form.get("winner")
+
+    player_nicks = request.form.getlist("player_nick[]")
+    player_champs = request.form.getlist("player_champ[]")
+    player_kdas = request.form.getlist("player_kda[]")
+    player_teams = request.form.getlist("player_team[]")
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO matches (date, winner) VALUES (?, ?)", (date, winner))
+    match_id = cursor.lastrowid
+
+    for nick, champ, kda, team in zip(player_nicks, player_champs, player_kdas, player_teams):
+        cursor.execute("INSERT INTO players (match_id, nickname, champion, kda, team) VALUES (?, ?, ?, ?, ?)",
+                       (match_id, nick, champ, kda, team))
+
+    conn.commit()
+    conn.close()
+    return redirect("/")
+
+@app.route('/delete_match/<int:match_id>', methods=['POST'])
+def delete_match(match_id):
     if not session.get("logged_in"):
         return redirect("/")
-    
-    if request.method == "POST":
-        date = request.form.get("date")
-        winner = request.form.get("winner")
-        
-        player_nicks = request.form.getlist("player_nick[]")
-        player_champs = request.form.getlist("player_champ[]")
-        player_kdas = request.form.getlist("player_kda[]")
-        player_teams = request.form.getlist("player_team[]")
 
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO matches (date, winner) VALUES (?, ?)", (date, winner))
-        match_id = cursor.lastrowid
-
-        for nick, champ, kda, team in zip(player_nicks, player_champs, player_kdas, player_teams):
-            cursor.execute("INSERT INTO players (match_id, nickname, champion, kda, team) VALUES (?, ?, ?, ?, ?)",
-                           (match_id, nick, champ, kda, team))
-
-        conn.commit()
-        conn.close()
-        return redirect("/")
-
-    return render_template("add_match.html")
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM players WHERE match_id=?", (match_id,))
+    cursor.execute("DELETE FROM matches WHERE id=?", (match_id,))
+    conn.commit()
+    conn.close()
+    return redirect("/")
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    init_db()
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
