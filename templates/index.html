@@ -65,5 +65,14 @@
             </div>
         </div>
     {% endfor %}
+    <hr>
+<form action="/login" method="post">
+    <h3>Вход для администратора</h3>
+    <label>Логин:</label><br>
+    <input type="text" name="username"><br>
+    <label>Пароль:</label><br>
+    <input type="password" name="password"><br><br>
+    <button type="submit">Войти</button>
+</form>
 </body>
 </html>
