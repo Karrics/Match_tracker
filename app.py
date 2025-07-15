@@ -1,77 +1,15 @@
 from flask import Flask, render_template, request, redirect, session
 import psycopg2
 import os
-import secrets
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(16)
+app.secret_key = "your_secret_key_here"
 
 # Подключение к PostgreSQL
 def get_db_connection():
     DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres.arwdrcdztrinbsdcunky:6U7YZ3hoVzt5ECd7@aws-0-eu-north-1.pooler.supabase.com:5432/postgres")
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     return conn
-
-
-
-# Инициализация таблиц
-def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Таблица матчей
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS matches (
-            id SERIAL PRIMARY KEY,
-            custom_id INTEGER UNIQUE,
-            date TEXT,
-            winner TEXT
-        )
-    ''')
-
-    # Таблица игроков
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS players (
-            id SERIAL PRIMARY KEY,
-            match_id INTEGER,
-            nickname TEXT,
-            champion TEXT,
-            kda TEXT,
-            team TEXT,
-            FOREIGN KEY(match_id) REFERENCES matches(id)
-        )
-    ''')
-
-    # Таблица админов
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS admins (
-            id SERIAL PRIMARY KEY,
-            username TEXT UNIQUE,
-            password TEXT
-        )
-    ''')
-
-    # Таблица для счётчика
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS match_counter (
-            id SERIAL PRIMARY KEY,
-            current_value INTEGER NOT NULL DEFAULT 1
-        )
-    ''')
-
-    # Вставляем тестового админа
-    try:
-        cursor.execute("INSERT INTO admins (username, password) VALUES ('admin', 'password123') ON CONFLICT (username) DO NOTHING")
-    except:
-        pass
-
-    # Вставляем начальное значение счётчика, если его нет
-    cursor.execute("SELECT COUNT(*) FROM match_counter")
-    if cursor.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO match_counter (current_value) VALUES (1)")
-
-    conn.commit()
-    conn.close()
 
 # Получить все матчи
 def get_matches():
@@ -95,16 +33,6 @@ def get_matches():
 
     conn.close()
     return result
-
-# Получить следующий номер матча
-def get_next_custom_id():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE match_counter SET current_value = current_value + 1 RETURNING current_value - 1")
-    next_id = cursor.fetchone()[0]
-    conn.commit()
-    conn.close()
-    return next_id
 
 @app.route('/')
 def home():
@@ -145,11 +73,14 @@ def add_match():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Получаем уникальный порядковый номер матча
-    custom_id = get_next_custom_id()
+    # Получаем следующий номер матча
+    cursor.execute("UPDATE match_counter SET current_value = current_value + 1 RETURNING current_value - 1")
+    next_id = cursor.fetchone()[0]
+    conn.commit()
 
     # Добавляем матч
-    cursor.execute("INSERT INTO matches (custom_id, date, winner) VALUES (%s, %s, %s) RETURNING id", (custom_id, date, winner))
+    cursor.execute("INSERT INTO matches (custom_id, date, winner) VALUES (%s, %s, %s) RETURNING id",
+                   (next_id, date, winner))
     match_id = cursor.fetchone()[0]
 
     # Добавляем игроков
@@ -177,5 +108,5 @@ def delete_match(match_id):
 
 if __name__ == '__main__':
     import os
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))  # Render использует порт 10000 по умолчанию
     app.run(host="0.0.0.0", port=port)
