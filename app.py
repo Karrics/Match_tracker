@@ -16,7 +16,7 @@ def get_matches():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM matches ORDER BY custom_id ASC")
+    cursor.execute("SELECT * FROM matches ORDER BY id DESC")
     matches = cursor.fetchall()
 
     result = []
