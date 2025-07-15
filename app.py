@@ -8,7 +8,7 @@ app.secret_key = secrets.token_hex(16)
 
 # Подключение к PostgreSQL
 def get_db_connection():
-    DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres.arwdrcdztrinbsdcunky:vfnxNhtrth@aws-0-eu-north-1.pooler.supabase.com:6543/postgres")
+    DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:vfnxNhtrth@db.arwdrcdztrinbsdcunky.supabase.co:5432/postgres")
     conn = psycopg2.connect(DATABASE_URL)
     return conn
 
