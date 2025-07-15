@@ -83,11 +83,10 @@
                                 {% for nick in nicks %}
                                     <option value="{{ nick }}">{{ nick }}</option>
                                 {% endfor %}
-                                <option value="new_nick">➕ Ввести свой ник</option>
                             </select><br><br>
 
                             <label>Персонаж:</label><br>
-                            <input type="text" name="player_champ[]" placeholder="ezreal" required><br>
+                            <input type="text" name="player_champ[]" placeholder="Ezreal" required><br>
 
                             <label>KDA:</label><br>
                             <input type="text" name="player_kda[]" placeholder="10/2/5" required><br>
@@ -101,10 +100,15 @@
                     {% for i in range(5) %}
                         <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
                             <label>Ник:</label><br>
-                            <input type="text" name="player_nick[]" required><br>
+                            <select name="player_nick[]" required>
+                                <option value="">-- Выберите ник --</option>
+                                {% for nick in nicks %}
+                                    <option value="{{ nick }}">{{ nick }}</option>
+                                {% endfor %}
+                            </select><br><br>
 
                             <label>Персонаж:</label><br>
-                            <input type="text" name="player_champ[]" placeholder="jinx" required><br>
+                            <input type="text" name="player_champ[]" placeholder="Jinx" required><br>
 
                             <label>KDA:</label><br>
                             <input type="text" name="player_kda[]" placeholder="7/3/6" required><br>

@@ -37,7 +37,8 @@ def get_matches():
 @app.route('/')
 def home():
     matches = get_matches()
-    return render_template("index.html", matches=matches, session=session)
+    known_nicks = ["Karrics", "Shanhua", "HeBiBoBa", "Bolt n Jolt", "KinderVI", "Falke", "Ivabat", "wagoogus", "みどりみこ", "Nochy", "neofelis788", "T1kTakCat", "Frurik", "Rataty2001", "K0к0li0", "BENDYBOY", "Angel"]
+    return render_template("index.html", matches=matches, session=session, nicks=known_nicks)
 
 @app.route('/login', methods=["POST"])
 def login():
