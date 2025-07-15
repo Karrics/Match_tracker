@@ -128,7 +128,7 @@
                     <strong>Синяя команда</strong>
                     {% for player in match.players if player[5] == 'Синяя' %}
                         <div class="player">
-                            <img src="https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/ {{ player[3] }}.png" alt="{{ player[3] }}" width="30">
+                            <img src="/static/images/{{ player[3] }}.png" alt="{{ player[3] }}" width="30">
                             {{ player[2] }} ({{ player[3] }}) — KDA: {{ player[4] }}
                         </div>
                     {% endfor %}
@@ -137,7 +137,7 @@
                     <strong>Красная команда</strong>
                     {% for player in match.players if player[5] == 'Красная' %}
                         <div class="player">
-                            <img src="https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/ {{ player[3] }}.png" alt="{{ player[3] }}" width="30">
+                            <img src="/static/images/{{ player[3] }}.png" alt="{{ player[3] }}" width="30">
                             {{ player[2] }} ({{ player[3] }}) — KDA: {{ player[4] }}
                         </div>
                     {% endfor %}
