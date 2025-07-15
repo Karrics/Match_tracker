@@ -60,37 +60,46 @@ def logout():
     session.pop("logged_in", None)
     return redirect("/")
 
-@app.route('/add_match', methods=["POST"])
+@app.route('/add_match', methods=["GET", "POST"])
 def add_match():
-    date = request.form.get("date")
-    winner = request.form.get("winner")
+    if not session.get("logged_in"):
+        return redirect("/")
 
-    player_nicks = request.form.getlist("player_nick[]")
-    player_champs = request.form.getlist("player_champ[]")
-    player_kdas = request.form.getlist("player_kda[]")
-    player_teams = request.form.getlist("player_team[]")
+    # Список всех известных никнеймов
+    known_nicks = ["Karrics", "Shanhua", "HeBiBoBa", "Bolt n Jolt", "KinderVI", "Falke", "Ivabat", "wagoogus", "みどりみこ", "Nochy", "neofelis788", "T1kTakCat", "Frurik", "Rataty2001", "K0к0li0", "BENDYBOY", "Angel"]
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    if request.method == "POST":
+        date = request.form.get("date")
+        winner = request.form.get("winner")
 
-    # Получаем следующий номер матча
-    cursor.execute("UPDATE match_counter SET current_value = current_value + 1 RETURNING current_value - 1")
-    next_id = cursor.fetchone()[0]
-    conn.commit()
+        player_nicks = request.form.getlist("player_nick[]")
+        player_champs = request.form.getlist("player_champ[]")
+        player_kdas = request.form.getlist("player_kda[]")
+        player_teams = request.form.getlist("player_team[]")
 
-    # Добавляем матч
-    cursor.execute("INSERT INTO matches (custom_id, date, winner) VALUES (%s, %s, %s) RETURNING id",
-                   (next_id, date, winner))
-    match_id = cursor.fetchone()[0]
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    # Добавляем игроков
-    for nick, champ, kda, team in zip(player_nicks, player_champs, player_kdas, player_teams):
-        cursor.execute("INSERT INTO players (match_id, nickname, champion, kda, team) VALUES (%s, %s, %s, %s, %s)",
-                       (match_id, nick, champ, kda, team))
+        # Получаем следующий номер матча
+        cursor.execute("UPDATE match_counter SET current_value = current_value + 1 RETURNING current_value - 1")
+        next_id = cursor.fetchone()[0]
+        conn.commit()
 
-    conn.commit()
-    conn.close()
-    return redirect("/")
+        # Добавляем матч
+        cursor.execute("INSERT INTO matches (custom_id, date, winner) VALUES (%s, %s, %s) RETURNING id",
+                       (next_id, date, winner))
+        match_id = cursor.fetchone()[0]
+
+        # Добавляем игроков
+        for nick, champ, kda, team in zip(player_nicks, player_champs, player_kdas, player_teams):
+            cursor.execute("INSERT INTO players (match_id, nickname, champion, kda, team) VALUES (%s, %s, %s, %s, %s)",
+                           (match_id, nick, champ, kda, team))
+
+        conn.commit()
+        conn.close()
+        return redirect("/")
+    
+    return render_template("add_match.html", nicks=known_nicks)
 
 @app.route('/delete_match/<int:match_id>', methods=['POST'])
 def delete_match(match_id):

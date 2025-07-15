@@ -35,44 +35,56 @@
             <option value="Красная">Красная</option>
         </select><br><br>
 
-        <div class="team-container">
-            <!-- Синяя команда -->
-            <div>
-                <h3>Синяя команда (слева)</h3>
-                {% for i in range(5) %}
-                    <div class="player-form">
-                        <h4>Игрок {{ i+1 }}</h4>
-                        <label>Ник:</label><br>
-                        <input type="text" name="player_nick[]" required><br>
-
-                        <label>Персонаж (имя файла):</label><br>
-                        <input type="text" name="player_champ[]" placeholder="ezreal" required><br>
-
-                        <label>KDA:</label><br>
-                        <input type="text" name="player_kda[]" placeholder="10/2/5" required><br>
-
-                        <input type="hidden" name="player_team[]" value="Синяя">
-                    </div>
-                {% endfor %}
-            </div>
+        <div class="team-blue">
+            <h3>Синяя команда (слева)</h3>
+            {% for i in range(5) %}
+                <div class="player-form">
+                    <h4>Игрок {{ loop.index }}</h4>
+        
+                    <label>Ник:</label><br>
+                    <select name="player_nick[]" required>
+                        <option value="">-- Выберите ник --</option>
+                        {% for nick in nicks %}
+                            <option value="{{ nick }}">{{ nick }}</option>
+                        {% endfor %}
+                        <option value="new_nick">➕ Ввести свой ник</option>
+                    </select><br><br>
+        
+                    <label>Персонаж:</label><br>
+                    <input type="text" name="player_champ[]" placeholder="ezreal" required><br><br>
+        
+                    <label>KDA:</label><br>
+                    <input type="text" name="player_kda[]" placeholder="10/2/5" required><br><br>
+        
+                    <input type="hidden" name="player_team[]" value="Синяя">
+                </div>
+            {% endfor %}
+        </div>
 
             <!-- Красная команда -->
             <div>
                 <h3>Красная команда (справа)</h3>
                 {% for i in range(5) %}
-                    <div class="player-form">
-                        <h4>Игрок {{ loop.index + 5 }}</h4>
-                        <label>Ник:</label><br>
-                        <input type="text" name="player_nick[]" required><br>
-
-                        <label>Персонаж (имя файла):</label><br>
-                        <input type="text" name="player_champ[]" placeholder="jinx" required><br>
-
-                        <label>KDA:</label><br>
-                        <input type="text" name="player_kda[]" placeholder="7/3/6" required><br>
-
-                        <input type="hidden" name="player_team[]" value="Красная">
-                    </div>
+                <div class="player-form">
+                    <h4>Игрок {{ loop.index }}</h4>
+        
+                    <label>Ник:</label><br>
+                    <select name="player_nick[]" required>
+                        <option value="">-- Выберите ник --</option>
+                        {% for nick in nicks %}
+                            <option value="{{ nick }}">{{ nick }}</option>
+                        {% endfor %}
+                        <option value="new_nick">➕ Ввести свой ник</option>
+                    </select><br><br>
+        
+                    <label>Персонаж:</label><br>
+                    <input type="text" name="player_champ[]" placeholder="ezreal" required><br><br>
+        
+                    <label>KDA:</label><br>
+                    <input type="text" name="player_kda[]" placeholder="10/2/5" required><br><br>
+        
+                    <input type="hidden" name="player_team[]" value="Синяя">
+                </div>
                 {% endfor %}
             </div>
         </div>
