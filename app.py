@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, session
 import psycopg2
 import os
+import secrets
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key_here"
+app.secret_key = secrets.token_hex(16)
 
 # Подключение к PostgreSQL
 def get_db_connection():
