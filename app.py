@@ -60,12 +60,13 @@ def logout():
     session.pop("logged_in", None)
     return redirect("/")
 
+
+
 @app.route('/add_match', methods=["GET", "POST"])
 def add_match():
     if not session.get("logged_in"):
         return redirect("/")
 
-    # Список всех известных никнеймов
     known_nicks = ["Karrics", "Shanhua", "HeBiBoBa", "Bolt n Jolt", "KinderVI", "Falke", "Ivabat", "wagoogus", "みどりみこ", "Nochy", "neofelis788", "T1kTakCat", "Frurik", "Rataty2001", "K0к0li0", "BENDYBOY", "Angel"]
 
     if request.method == "POST":
@@ -80,17 +81,14 @@ def add_match():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Получаем следующий номер матча
         cursor.execute("UPDATE match_counter SET current_value = current_value + 1 RETURNING current_value - 1")
         next_id = cursor.fetchone()[0]
         conn.commit()
 
-        # Добавляем матч
         cursor.execute("INSERT INTO matches (custom_id, date, winner) VALUES (%s, %s, %s) RETURNING id",
                        (next_id, date, winner))
         match_id = cursor.fetchone()[0]
 
-        # Добавляем игроков
         for nick, champ, kda, team in zip(player_nicks, player_champs, player_kdas, player_teams):
             cursor.execute("INSERT INTO players (match_id, nickname, champion, kda, team) VALUES (%s, %s, %s, %s, %s)",
                            (match_id, nick, champ, kda, team))
